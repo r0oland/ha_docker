@@ -1,19 +1,6 @@
 # Docker Compose Infos / Commands
 
-## start named systools
-
-docker-compose -p "sys_tools" -f "docker/docker-compose-system-tools.yml" up --force-recreate --build --remove-orphans -d
-
-## start home assistant container with default names
-
-docker-compose -f "docker/docker-compose-homeassi.yml" up --force-recreate --build --remove-orphans -d
-docker-compose -f "docker/home_assistant/docker-compose-homeassi.yml" up --force-recreate --build --remove-orphans -d
-docker-compose -f "docker/docker-compose-homeassi.yml" down
-
-## Update, then restart
-
-docker-compose pull
-docker-compose up --detach --build
+Docker commands should be executed in the folder where the docker-compose.yml file resides, in my case that is for example `~/docker/home_assistant`
 
 ## Shutdown, update and restart all stacks / container
 
