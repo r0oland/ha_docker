@@ -1,0 +1,4 @@
+sudo mkdir /mnt/media
+sudo mount -t nfs 192.168.178.2:/volume1/Media /mnt/media
+
+sudo umount -l /mnt/media

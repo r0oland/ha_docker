@@ -1,0 +1,17 @@
+homeassistant:
+    container_name: homeassistant
+    image: ha-custom:latest
+    network_mode: "host"
+    volumes:
+      - /opt/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    restart: on-failure
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8123"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
