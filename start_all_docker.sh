@@ -5,3 +5,4 @@ export PLEX_COMPOSE_FILE="plex/docker-compose.yml"
 docker-compose -f $TOOLS_COMPOSE_FILE up --remove-orphans -d
 docker-compose -f $HA_COMPOSE_FILE up --remove-orphans -d
 docker-compose -f $PLEX_COMPOSE_FILE up --remove-orphans -d
+
