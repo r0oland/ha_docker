@@ -19,5 +19,3 @@ services:
       - /home/r0oland/docker/data/plex_data/temp:/transcode
       - /mnt/media/Movies:/movies
       - /mnt/media/Shows:/shows
-    devices:
-      - "/dev/ttyUSB0:/dev/ttyUSB0"

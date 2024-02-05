@@ -11,42 +11,17 @@ services:
     privileged: true
     network_mode: host
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_c09c3e0feb21ec11a74920c32c86906c-if00-port0:/dev/ttyUSB0
+      - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0064-if00-port0:/dev/ttyUSB1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:8123"]
       interval: 120s
       timeout: 10s
       retries: 3
     depends_on:
-      - mosquitto
-      - node-red
-      - tasmoadmin
       - grafana
-
-################### Node Red
-  node-red:
-    container_name: node_red
-    image: nodered/node-red:latest
-    environment:
-      - TZ=Europe/Amsterdam
-    ports:
-      - 1880:1880
-    networks:
-      - node-red-net
-    volumes:
-      - node-red-data:/data
-    restart: always
-
-###################TASMOADMIN
-  tasmoadmin:
-    container_name: tasmoadmin
-    image: raymondmm/tasmoadmin
-    ports:
-      - 9999:80
-    volumes:
-      - /home/r0oland/docker/data/tasmoadmin_data:/data
-    restart: always
-
+      - mosquitto
+      # - zigbee2mqtt
 
 ###################
   mosquitto:
@@ -57,22 +32,24 @@ services:
       - 1883:1883
       - 9001:9001
     volumes:
+      - /home/r0oland/docker/data/mosquitto_data:/mosquitto
       - /home/r0oland/docker/data/mosquitto_data/data:/mosquitto/data
       - /home/r0oland/docker/data/mosquitto_data/log:/mosquitto/log
-      - /home/r0oland/docker/data/mosquitto_data/config:/mosquitto/config
     restart: always
 
 # ###################
-# disable for now, we are adding our ESP home devices manually
-# see https://github.com/r0oland/SmartHomePlayground/tree/main/ESP32_to_HomeAssistant
-#   esphome:
-#     image: esphome/esphome
-#     volumes:
-#       - /home/r0oland/docker/data/esphome:/config:rw
-#       # Use local time for logging timestamps
-#       - /etc/localtime:/etc/localtime:ro
-#     network_mode: host
-#     restart: always  
+  # zigbee2mqtt:
+  #   container_name: zigbee2mqtt
+  #   image: koenkk/zigbee2mqtt
+  #   volumes:
+  #     - /home/r0oland/docker/data/zigbee2mqtt_data:/app/data
+  #   ports:
+  #     - 8080:8080
+  #   devices:
+  #     - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_c09c3e0feb21ec11a74920c32c86906c-if00-port0:/dev/ttyACM0
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mosquitto
 
 ###################
   influxdb:
@@ -83,10 +60,7 @@ services:
       - /home/r0oland/docker/data/influxData:/var/lib/influxdb2:rw
     environment:
       - INFLUXDB_DB=db0
-      - INFLUXDB_ADMIN_USER=${INFLUXDB_USERNAME}
-      - INFLUXDB_ADMIN_PASSWORD=${INFLUXDB_PASSWORD}
     restart: always  
-    
 
 ###################
   chronograf:
@@ -130,15 +104,50 @@ services:
       GLANCES_OPT: "-w" 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      # - /home/r0oland/docker/data/glances:/glances/conf/glances.conf
     pid: "host"
-    restart: always
+
+
+# ###################
+# disable for now, we are adding our ESP home devices manually
+# see https://github.com/r0oland/SmartHomePlayground/tree/main/ESP32_to_HomeAssistant
+  # esphome:
+  #   image: esphome/esphome
+  #   volumes:
+  #     - /home/r0oland/docker/data/esphome:/config:rw
+  #     # Use local time for logging timestamps
+  #     - /etc/localtime:/etc/localtime:ro
+  #   network_mode: host
+  #   restart: always  
+  
+################### Node Red
+  # node-red:
+  #   container_name: node_red
+  #   image: nodered/node-red:latest
+  #   environment:
+  #     - TZ=Europe/Amsterdam
+  #   ports:
+  #     - 1880:1880
+  #   networks:
+  #     - node-red-net
+  #   volumes:
+  #     - node-red-data:/data
+  #   restart: always
+
+###################TASMOADMIN
+  # tasmoadmin:
+  #   container_name: tasmoadmin
+  #   image: raymondmm/tasmoadmin
+  #   ports:
+  #     - 9999:80
+  #   volumes:
+  #     - /home/r0oland/docker/data/tasmoadmin_data:/data
+  #   restart: always
 
 # Volumes ======================================================================
 volumes:
-  tasmoadmin_data:
-  node-red-data:
   chronograf-storage:
+  # tasmoadmin_data:
+  # node-red-data:
 
-networks:
-  node-red-net:
+# networks:
+  # node-red-net:

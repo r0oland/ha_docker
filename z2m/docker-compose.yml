@@ -1,0 +1,12 @@
+  version: '3'
+  services:
+    zigbee2mqtt:
+      container_name: zigbee2mqtt
+      image: koenkk/zigbee2mqtt
+      volumes:
+        - /home/r0oland/docker/data/zigbee2mqtt_data:/app/data
+      ports:
+        - 8080:8080
+      devices:
+        - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_c09c3e0feb21ec11a74920c32c86906c-if00-port0:/dev/ttyACM0
+      restart: unless-stopped
