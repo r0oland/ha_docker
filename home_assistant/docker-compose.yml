@@ -7,11 +7,12 @@ services:
     volumes:
       - /home/r0oland/docker/data/homeassistant_data:/config
       - /etc/localtime:/etc/localtime:ro
-    restart: always
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
     privileged: true
     network_mode: host
     devices:
-      - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_c09c3e0feb21ec11a74920c32c86906c-if00-port0:/dev/ttyUSB0
+      # - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_c09c3e0feb21ec11a74920c32c86906c-if00-port0:/dev/ttyUSB0
       - /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0064-if00-port0:/dev/ttyUSB1
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:8123"]
@@ -27,7 +28,6 @@ services:
   mosquitto:
     container_name: mosquitto
     image: eclipse-mosquitto
-    # network_mode: host
     ports:
       - 1883:1883
       - 9001:9001
@@ -35,21 +35,21 @@ services:
       - /home/r0oland/docker/data/mosquitto_data:/mosquitto
       - /home/r0oland/docker/data/mosquitto_data/data:/mosquitto/data
       - /home/r0oland/docker/data/mosquitto_data/log:/mosquitto/log
-    restart: always
+    restart: unless-stopped
 
 # ###################
-  # zigbee2mqtt:
-  #   container_name: zigbee2mqtt
-  #   image: koenkk/zigbee2mqtt
-  #   volumes:
-  #     - /home/r0oland/docker/data/zigbee2mqtt_data:/app/data
-  #   ports:
-  #     - 8080:8080
-  #   devices:
-  #     - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_c09c3e0feb21ec11a74920c32c86906c-if00-port0:/dev/ttyACM0
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - mosquitto
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    image: koenkk/zigbee2mqtt
+    volumes:
+      - /home/r0oland/docker/data/zigbee2mqtt_data:/app/data
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    # devices:
+      # - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_c09c3e0feb21ec11a74920c32c86906c-if00-port0:/dev/ttyACM0
 
 ###################
   influxdb:
@@ -60,7 +60,7 @@ services:
       - /home/r0oland/docker/data/influxData:/var/lib/influxdb2:rw
     environment:
       - INFLUXDB_DB=db0
-    restart: always  
+    restart: unless-stopped  
 
 ###################
   chronograf:
@@ -75,9 +75,8 @@ services:
       - INFLUXDB_URL=http://influxdb:8086
       - INFLUXDB_USERNAME=${INFLUXDB_USERNAME}
       - INFLUXDB_PASSWORD=${INFLUXDB_PASSWORD}
-    restart: always  
+    restart: unless-stopped  
     
-
 ###################
   grafana:
     image: grafana/grafana:latest
@@ -92,12 +91,12 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-    restart: always
+    restart: unless-stopped
 
 ###################
   glances:
     image: nicolargo/glances:latest-full
-    restart: always
+    restart: unless-stopped
     ports:
       - "61208:61208"
     environment:
@@ -117,7 +116,7 @@ services:
   #     # Use local time for logging timestamps
   #     - /etc/localtime:/etc/localtime:ro
   #   network_mode: host
-  #   restart: always  
+  #   restart: unless-stopped  
   
 ################### Node Red
   # node-red:
@@ -131,7 +130,7 @@ services:
   #     - node-red-net
   #   volumes:
   #     - node-red-data:/data
-  #   restart: always
+  #   restart: unless-stopped
 
 ###################TASMOADMIN
   # tasmoadmin:
@@ -141,7 +140,7 @@ services:
   #     - 9999:80
   #   volumes:
   #     - /home/r0oland/docker/data/tasmoadmin_data:/data
-  #   restart: always
+  #   restart: unless-stopped
 
 # Volumes ======================================================================
 volumes:
