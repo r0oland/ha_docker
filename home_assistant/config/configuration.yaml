@@ -1,0 +1,162 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+influxdb:
+  api_version: 2
+  ssl: false
+  host: localhost
+  port: 8086
+  token: -dduSHrJ5ZUmszUOCkCLva2joLYj6-YRC35U_H-FtAGvA7hX4zXy-XgSeZEMj-IEOnLwEHE7zy3Ebt_IW5wQXw==
+  organization: HA
+  bucket: HomeAssistant
+  default_measurement: units
+  exclude:
+    domains:
+      - persistent_notification
+      - light
+      - media_player
+      - scene
+      - zone
+    
+pyscript:
+  allow_all_imports: true
+  hass_is_global: true
+
+logger:
+  default: info
+  logs:
+    custom_components.pyscript: info
+
+# Modbus Varta pulse neo ------------------------------
+modbus:
+  - name: mb_varta
+    type: tcp
+    host: 192.168.178.83
+    port: 502
+    delay: 1
+    timeout: 3
+    message_wait_milliseconds: 250
+    sensors:
+### Active Power - positive:charge / negative: discharge
+    - name: mb_varta_active_power
+      unique_id: "mb_varta_active_power" 
+      slave: 1
+      address: 1066
+      data_type: int16
+      precision: 0
+      scale: 1
+      device_class: power
+      unit_of_measurement: "W"
+### State of Charge
+    - name: mb_varta_capacity_percent
+      unique_id: "mb_varta_capacity_percent" 
+      slave: 1
+      address: 1068
+      data_type: uint16
+      precision: 0
+      scale: 1
+      device_class: battery
+      unit_of_measurement: "%"
+### Installed capacity
+    - name: mb_varta_capacity
+      unique_id: "mb_varta_capacity" 
+      slave: 1
+      address: 1071
+      data_type: uint16
+      precision: 0
+      scale: 10
+      device_class: energy
+      unit_of_measurement: "Wh"
+### Grid Power
+    - name: mb_varta_measured_grid_power
+      unique_id: "mb_varta_measured_grid_power" 
+      slave: 1
+      address: 1078
+      data_type: int16
+      precision: 0
+      scale: 1
+      device_class: power
+      unit_of_measurement: "W"
+
+# Some Filtering for the lulz
+sensor:
+  - platform: filter
+    name: "Varta Filtered Battery Power"
+    unique_id: "varta_output_power_filt"  
+    entity_id: sensor.varta_output_power
+    filters:
+      - filter: time_simple_moving_average
+        window_size: "00:30"
+        precision: 1
+
+# Varta input/output
+template:
+  - sensor:
+    - name: "Varta Input Power"
+      unique_id: "varta_input_power" 
+      unit_of_measurement: "W"
+      state_class: measurement
+      device_class: power
+      state: >
+        {% if states('sensor.mb_varta_active_power') | float(0) >= 0 %}
+        {% set varta_in = states('sensor.mb_varta_active_power') | float(0) %}
+        {% else %}
+        {% set varta_in = 0 %}
+        {% endif %}
+        {{ varta_in }}
+        
+  - sensor:
+    - name: "Varta Output Power"
+      unique_id: "varta_output_power" 
+      unit_of_measurement: "W"
+      state_class: measurement
+      device_class: power
+      state: >
+        {% if states('sensor.mb_varta_active_power') | float(0) < 0 %}
+        {% set varta_out = states('sensor.mb_varta_active_power') | float(0) *-1 %}
+        {% else %}
+        {% set varta_out = 0 %}
+        {% endif %}
+        {{ varta_out }}
+
+# Remaining Battery Energy in Wh
+  - sensor:
+      - name: "Varta Remaining Energy"
+        unique_id: "varta_remaining_energy"  
+        unit_of_measurement: "Wh"
+        state_class: measurement
+        device_class: energy
+        state: >
+          {% set soc = states('sensor.mb_varta_capacity_percent') | float(0) %}
+          {% set capacity = states('sensor.mb_varta_capacity') | float(0) %}
+          {{ (soc * capacity / 100) | round(2) }}
+
+  - sensor:
+      - name: "Varta Remaining Time"
+        unique_id: "varta_remaining_time"
+        unit_of_measurement: "hours"
+        state_class: measurement
+        device_class: duration
+        state: >
+          {% set remaining_energy = states('sensor.varta_remaining_energy') | float(0) %}
+          {% set filtered_power = states('sensor.varta_filtered_battery_power') | float(0) %}
+          {% if filtered_power > 0 %}
+            {{ (remaining_energy / filtered_power) | round(2) }}
+          {% else %}
+            0
+          {% endif %}
+
+notify:
+  - name: ALL_DEVICES
+    platform: group
+    services:
+      - action: mobile_app_pixel_7_pro
+      - action: mobile_app_stefipixel

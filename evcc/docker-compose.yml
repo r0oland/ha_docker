@@ -13,7 +13,7 @@ services:
     volumes:
       - /etc/machine-id:/etc/machine-id
       - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
-      - /home/r0oland/docker/data/evcc/.evcc:/root/.evcc
-      - /home/r0oland/docker/data/evcc/evcc.yaml:/etc/evcc.yaml
+      - /home/r0oland/docker/data/evcc/:/root/.evcc
+      - /home/r0oland/docker/evcc/evcc.yaml:/etc/evcc.yaml
     network_mode: host
     restart: unless-stopped

@@ -1,0 +1,88 @@
+# open evcc at http://evcc.local:7070
+network:
+  schema: http
+  host: evcc.local # .local suffix announces the hostname on MDNS
+  port: 7070
+
+log: debug
+levels:
+  cache: error
+
+# unique installation id
+plant: c9a205485cb4a0dd51b3d6c2f66aedcc9ceb2c13fe0ede614acf01c3dbda03b8
+
+interval: 15s # every 30 seconds
+
+# payed token
+sponsortoken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJldmNjLmlvIiwic3ViIjoicjBvbGFuZCIsImV4cCI6MTgyMDAzNzYwMCwiaWF0IjoxNzI1NDI5NjAwLCJzcmMiOiJnaCJ9.YQqjJ4Y8Aumb2R4n1GVyVSuye8BEdT_Ad8GFdOdzF0o
+
+# sponsors can set telemetry: true to enable anonymous data aggregation
+# see https://github.com/evcc-io/evcc/discussions/4554
+telemetry: true
+
+# mqtt message broker
+mqtt:
+  broker: 192.168.178.3:1883
+  topic: evcc # root topic for publishing, set empty to disable publishing
+
+meters:
+- type: template
+  template: varta 
+  usage: grid  
+  host: 192.168.178.83  
+  port: 502  
+  name: grid1
+
+- type: template
+  template: varta 
+  usage: pv  
+  host: 192.168.178.83  
+  port: 502  
+  name: pv1
+
+- type: template
+  template: varta 
+  usage: battery  
+  host: 192.168.178.83  
+  port: 502  
+  name: battery1
+
+chargers:
+- type: template
+  template: go-e-v3 
+  host: 192.168.178.85  
+  name: wallbox1
+
+loadpoints:
+- title: Garage
+  charger: wallbox1
+  mode: pv
+
+site:
+  title: Home
+  residualPower: 100
+  meters:
+    grid: grid1
+    pv:
+    - pv1
+    battery:
+    - battery1
+
+
+tariffs:
+  currency: EUR # (default EUR)
+  grid:
+    type: fixed
+    price: 0.2954 # EUR/kWh
+  feedin:
+    type: fixed
+    price: 0.08 # EUR/kWh
+
+vehicles:
+  - name: EV6
+    type: template
+    template: kia
+    title: EV6
+    user: johannesrebling@gmail.com 
+    password: '&hZ/8U94,RG8bNf' 
+    capacity: 77 

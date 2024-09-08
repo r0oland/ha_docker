@@ -5,7 +5,13 @@ services:
     container_name: home_assistant
     image: "homeassistant/home-assistant:latest"
     volumes:
+    # map general conf to data folder (gets larget due to DB) 
       - /home/r0oland/docker/data/homeassistant_data:/config
+    # map config related stuff to docker folder to keep long-term
+      - /home/r0oland/docker/home_assistant/config/pyscript/:/config/pyscript/
+      - /home/r0oland/docker/home_assistant/config/automations.yaml:/config/automations.yaml
+      - /home/r0oland/docker/home_assistant/config/configuration.yaml:/config/configuration.yaml
+    # some other stuff I don't remember what it does 
       - /etc/localtime:/etc/localtime:ro
       - /run/dbus:/run/dbus:ro
     restart: unless-stopped
@@ -43,6 +49,9 @@ services:
     image: koenkk/zigbee2mqtt
     volumes:
       - /home/r0oland/docker/data/zigbee2mqtt_data:/app/data
+      # z2m configured with HA so we store conf there as well
+      - /home/r0oland/docker/home_assistant/z2m_conf.yaml:/app/data/configuration.yaml
+
     ports:
       - 8080:8080
     restart: unless-stopped

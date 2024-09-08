@@ -1,0 +1,118 @@
+homeassistant: true
+frontend: true
+permit_join: false
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://192.168.178.3:1883
+serial:
+  port: tcp://192.168.178.54:6638
+  baudrate: 115200
+  disable_led: false
+advanced:
+  transmit_power: 20
+  pan_id: 5839
+  ext_pan_id:
+    - 124
+    - 35
+    - 245
+    - 19
+    - 169
+    - 170
+    - 179
+    - 161
+  channel: 15
+  network_key:
+    - 86
+    - 8
+    - 174
+    - 164
+    - 28
+    - 109
+    - 205
+    - 133
+    - 209
+    - 195
+    - 159
+    - 208
+    - 155
+    - 204
+    - 164
+    - 81
+  homeassistant_legacy_entity_attributes: false
+  legacy_api: false
+  legacy_availability_payload: false
+device_options:
+  legacy: false
+devices:
+  '0x30fb10fffe747fe8':
+    friendly_name: SNZB-02D_Linus
+  '0x00124b002513ac08':
+    friendly_name: SNZB-02_schlazi_oben
+  '0x00158d0008366e96':
+    friendly_name: motion_dach
+  '0x540f57fffe3c2241':
+    friendly_name: Plug_heizstrahler_werkstatt
+  '0x7cb03eaa0a030f02':
+    friendly_name: zigbee_plug_schwipp
+  '0x70ac08fffe96c3f7':
+    friendly_name: zigbee_lampe_keller_1
+  '0x70ac08fffe96c674':
+    friendly_name: zigbee_lampe_keller_2
+  '0x70ac08fffe96c3db':
+    friendly_name: zigbee_lampe_keller_3
+  '0x70ac08fffe97a9a3':
+    friendly_name: zigbee_lampe_keller_4
+  '0x70ac08fffe96bc08':
+    friendly_name: zigbee_lampe_keller_5
+  '0x30fb10fffe6e99b0':
+    friendly_name: SNZB-02D_wohzi
+  '0x00158d0002d4904d':
+    friendly_name: zigbee_licht_xx
+  '0x94deb8fffe314483':
+    friendly_name: szenaheater_switch
+  '0xa4c13800ab602d90':
+    friendly_name: zigbee_licht_flur2
+  '0xa4c13800ab50126c':
+    friendly_name: zigbee_licht_flur
+  '0x84b4dbfffe5314d8':
+    friendly_name: bosch_switch_dehumid
+  '0x84b4dbfffe6441b7':
+    friendly_name: bosch_switch_bausteln_gelb
+  '0x7cb03eaa0a00663a':
+    friendly_name: light_strip_joydivision
+  '0x001788010d35a45d':
+    friendly_name: hue_tap_dial
+  '0x84b4dbfffe5312ee':
+    friendly_name: bosch_switch_bausteln_weiß
+  '0x00178801080aa39f':
+    friendly_name: hue_switch_devices
+  '0x0017880103e25f53':
+    friendly_name: 'hue_light_strip_office '
+  '0xf0d1b80000200258':
+    friendly_name: light_strip_pano
+  '0x00124b002919e27c':
+    friendly_name: SNZB-03_office
+  '0x00124b0029195daf':
+    friendly_name: SNZB-02_waschkeller
+  '0x00124b0025131c56':
+    friendly_name: SNZB-02_garden
+  '0x0017880104e43732':
+    friendly_name: hue_switch_unused
+  '0x842712fffe82da4a':
+    friendly_name: SNZB-05P_waschkeller
+  '0x0ceff6fffe3a28f1':
+    friendly_name: SNZB-02D_bad_og
+  '0x842712fffe7c580c':
+    friendly_name: ' SNZB-02D_schlazi_unten'
+  '0x0ceff6fffe39d292':
+    friendly_name: SNZB-02D_werkstatt
+  '0x0ceff6fffe39d290':
+    friendly_name: SNZB-02D_office
+  '0x0ceff6fffe59c1b7':
+    friendly_name: SNZB-02D_kueche
+  '0x0ceff6fffe39e3db':
+    friendly_name: SNZB-06P
+groups: {}
+blocklist:
+  - '0x001788010d315c95'
+  - '0x00124b0029327e67'

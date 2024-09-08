@@ -1,0 +1,162 @@
+- id: '1701629291312'
+  alias: Szenarium LEDs
+  description: ''
+  trigger:
+  - platform: time
+    at: 08:00:00
+  - platform: time
+    at: '20:00:00'
+  condition: []
+  action:
+  - type: toggle
+    device_id: aa5322172f494bbca5be1cae84867caa
+    entity_id: fd645671fbb92040b4de28eb2bd414df
+    domain: light
+  mode: single
+- id: '1705472158339'
+  alias: Hue Office Remote -> Toggle Light Office
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 149546d309dd7666e4ee37ee1a312918
+    type: action
+    subtype: button_1_press
+    discovery_id: 0x001788010d35a45d action_button_1_press
+  condition: []
+  action:
+  - type: toggle
+    device_id: 5ab040fe3ba495dfc0552a74b6882840
+    entity_id: 6a5da3853f8fc8116666090b91fc2b25
+    domain: light
+  mode: single
+- id: '1705472382133'
+  alias: Hue Remotes -> PC Power Toggle
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 149546d309dd7666e4ee37ee1a312918
+    type: action
+    subtype: button_2_press
+    discovery_id: 0x001788010d35a45d action_button_2_press
+  - platform: device
+    domain: mqtt
+    device_id: 019edb6ff746214a3d176e1a6787e989
+    type: action
+    subtype: up_press
+    discovery_id: 0x00178801080aa39f action_up_press
+  condition: []
+  action:
+  - type: toggle
+    device_id: 0a919b8bea2b96ae05fd1bd1b6867c30
+    entity_id: 98be100d63cd72a48e062b5372ec0c81
+    domain: switch
+  mode: single
+- id: '1705472513954'
+  alias: Hue Remotes -> 3D Power Toggle
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 149546d309dd7666e4ee37ee1a312918
+    type: action
+    subtype: button_4_press
+    discovery_id: 0x001788010d35a45d action_button_4_press
+  - platform: device
+    domain: mqtt
+    device_id: 019edb6ff746214a3d176e1a6787e989
+    type: action
+    subtype: down_press
+    discovery_id: 0x00178801080aa39f action_down_press
+  condition: []
+  action:
+  - type: toggle
+    device_id: 14a52033e92e6332b0ad61ea8953d1f1
+    entity_id: 9ad688083c0fc0eb3eba5de1609e2c21
+    domain: switch
+  mode: single
+- id: '1705472600409'
+  alias: Hue Remotes -> Coffee
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 149546d309dd7666e4ee37ee1a312918
+    type: action
+    subtype: button_3_press
+    discovery_id: 0x001788010d35a45d action_button_3_press
+  - platform: device
+    domain: mqtt
+    device_id: 019edb6ff746214a3d176e1a6787e989
+    type: action
+    subtype: on_press
+    discovery_id: 0x00178801080aa39f action_on_press
+  condition: []
+  action:
+  - type: toggle
+    device_id: 7446735035bcf9248d01da05f555fc0e
+    entity_id: 1554d80784123bc7e58b34e9c5288b54
+    domain: switch
+  mode: single
+- id: '1705764889403'
+  alias: Waschmaschine fertig
+  description: ''
+  trigger:
+  - platform: device
+    device_id: 3345bab09ebcb95c84b9c7992e9faed7
+    domain: miele
+    entity_id: sensor.washing_machine_status
+    type: program_ended
+  condition: []
+  action:
+  - action: notify.all_devices
+    data:
+      message: Wäsche ist fertig du Luder!
+      title: Es war richtig schmutzig!
+  mode: single
+- id: '1705849624909'
+  alias: Joe Power Overview
+  description: ''
+  use_blueprint:
+    path: power.yaml
+    input:
+      awtrix:
+      - 1e0ebbd82e60b6b9bfc41736fcbfa35e
+      power_source: sensor.smart_meter_power
+- id: '1705849707796'
+  alias: Office Lights
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light.yaml
+    input:
+      motion_entity: binary_sensor.snzb_03_office_occupancy
+      light_target:
+        device_id: 5ab040fe3ba495dfc0552a74b6882840
+- id: '1721821987027'
+  alias: Waschkeller Auto Dehumid
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /15
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.smart_meter_power
+        below: -500
+      sequence:
+      - service: switch.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.bosch_switch_dehumid
+      alias: turn on if enough surplus
+    default:
+    - service: switch.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.bosch_switch_dehumid
+  mode: single
