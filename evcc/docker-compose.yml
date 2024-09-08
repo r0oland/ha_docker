@@ -1,0 +1,19 @@
+version: "3"
+services:
+  evcc:
+    command:
+      - evcc
+    container_name: evcc
+    image: evcc/evcc:latest
+    ports:
+      - 7070:7070/tcp
+      - 8887:8887/tcp
+      - 7090:7090/udp
+      - 9522:9522/udp
+    volumes:
+      - /etc/machine-id:/etc/machine-id
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id
+      - /home/r0oland/docker/data/evcc/.evcc:/root/.evcc
+      - /home/r0oland/docker/data/evcc/evcc.yaml:/etc/evcc.yaml
+    network_mode: host
+    restart: unless-stopped
